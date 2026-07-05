@@ -5,9 +5,19 @@ import { Card } from '../ui/Card';
 type VideoCardProps = {
   imageLabel: string;
   title: string;
+  url?: string;
 };
 
-export function VideoCard({ imageLabel, title }: VideoCardProps) {
+export function VideoCard({ imageLabel, title, url }: VideoCardProps) {
+  const handlePlay = () => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      const searchQuery = encodeURIComponent(title);
+      window.open(`https://www.youtube.com/results?search_query=${searchQuery}`, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <Card className="video-card">
       <div className="video-placeholder">{imageLabel}</div>
@@ -15,7 +25,7 @@ export function VideoCard({ imageLabel, title }: VideoCardProps) {
       <Button
         type="button"
         variant="secondary"
-        onClick={() => window.alert('Video placeholder. YouTube se conectara en una fase posterior.')}
+        onClick={handlePlay}
       >
         <Play size={18} />
         Ver video
