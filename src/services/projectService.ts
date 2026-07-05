@@ -31,7 +31,17 @@ function readLocalProjects(userId: string): SavedProject[] {
 }
 
 function writeLocalProjects(userId: string, projects: SavedProject[]) {
-  localStorage.setItem(getLocalProjectsKey(userId), JSON.stringify(projects));
+  try {
+    localStorage.setItem(getLocalProjectsKey(userId), JSON.stringify(projects));
+  } catch (error) {
+    throw new Error(
+      'No hay espacio en este navegador para guardar más proyectos. Configura Firebase en .env o libera espacio.',
+    );
+  }
+}
+
+export function isProjectCloudStorageEnabled(): boolean {
+  return isFirebaseConfigured();
 }
 
 async function uploadSketchPreview(

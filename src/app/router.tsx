@@ -10,6 +10,7 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { PlanMappingPage } from './pages/PlanMappingPage';
 import { ProfileSelectionPage } from './pages/ProfileSelectionPage';
 import { ProjectHistoryPage } from './pages/ProjectHistoryPage';
+import { EcoFriendlyPage } from './pages/EcoFriendlyPage';
 import { ResultsPage } from './pages/ResultsPage';
 import { UserPlaceholderPage } from './pages/UserPlaceholderPage';
 
@@ -48,6 +49,10 @@ export const router = createBrowserRouter([
       {
         path: '/usuario/resultados',
         element: <ResultsPage />,
+      },
+      {
+        path: '/usuario/ecofriendly',
+        element: <EcoFriendlyPage />,
       },
       {
         path: '/usuario/historial',

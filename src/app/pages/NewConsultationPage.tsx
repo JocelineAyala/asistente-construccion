@@ -1,22 +1,29 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
   Construction,
-  MoreHorizontal,
+  Leaf,
   PencilRuler,
   Sparkles,
 } from 'lucide-react';
 import houseIllustration from '../../assets/illustrations/house.svg';
 import { PageTitle } from '../../components/common/PageTitle';
+import { EcoLayerPicker } from '../../components/common/EcoLayerPicker';
 import { UploadCard } from '../../components/common/UploadCard';
+import { useAuth } from '../../context/AuthContext';
+import { MOCK_FLOOR_PLAN_ANALYSIS } from '../../constants/mockFloorPlan';
 import { mapMaterialsToVidriProducts } from '../../constants/storeProducts';
+import { listUserProjects } from '../../services/projectService';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
+import { FloorPlanAnalysis } from '../../types/floorPlan';
+import { DEFAULT_ECO_LAYERS, EcoViewLayers, hasAnyEcoLayer } from '../../types/ecoAnalysis';
+import { analyzeEcoPlan, saveEcoFriendlySession } from '../../utils/analyzeEcoPlan';
+import { clearFloorPlanSession, loadFloorPlanSession } from '../../utils/analyzeFloorPlan';
 import { fileToDataUrl } from '../../utils/openai';
-import { clearFloorPlanSession } from '../../utils/analyzeFloorPlan';
 
 const PENDING_PLAN_SKETCH_KEY = 'buildassist:pending-plan-sketch';
 const LAST_PROJECT_KEY = 'buildassist:last-project';
@@ -37,15 +44,23 @@ const CONSULTATION_OPTIONS = [
     tone: 'red',
   },
   {
-    icon: MoreHorizontal,
-    label: 'Otro',
-    placeholder: 'Describe que quieres mejorar, reparar o remodelar.',
-    tone: 'yellow',
+    icon: Leaf,
+    label: 'EcoFriendly',
+    placeholder: 'Ej: casa orientada al oeste, mucho calor en la tarde, quiero ahorrar luz...',
+    tone: 'green',
   },
 ];
 
+type EcoPlanSource = {
+  id: string;
+  title: string;
+  sketchPreview: string;
+  plan: FloorPlanAnalysis;
+};
+
 export function NewConsultationPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Core states
   const [imagePreview, setImagePreview] = useState<string>();
@@ -63,14 +78,72 @@ export function NewConsultationPage() {
   const [damageSize, setDamageSize] = useState('');
   const [damageBudget, setDamageBudget] = useState('50');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [ecoPlanSources, setEcoPlanSources] = useState<EcoPlanSource[]>([]);
+  const [selectedEcoPlanId, setSelectedEcoPlanId] = useState('');
+  const [ecoNotes, setEcoNotes] = useState('');
+  const [ecoLayers, setEcoLayers] = useState<EcoViewLayers>(DEFAULT_ECO_LAYERS);
+  const [isEcoAnalyzing, setIsEcoAnalyzing] = useState(false);
 
   const selectedOption = CONSULTATION_OPTIONS.find((option) => option.label === consultationType);
 
   useEffect(() => {
     localStorage.removeItem(LAST_RESULT_KEY);
     localStorage.removeItem(LAST_PROJECT_KEY);
-    clearFloorPlanSession();
   }, []);
+
+  useEffect(() => {
+    if (consultationType !== 'EcoFriendly') return;
+
+    const sources: EcoPlanSource[] = [
+      {
+        id: 'demo',
+        title: 'Plano de demostración',
+        sketchPreview: '',
+        plan: MOCK_FLOOR_PLAN_ANALYSIS,
+      },
+    ];
+
+    const localSession = loadFloorPlanSession();
+    if (localSession?.analysis) {
+      sources.unshift({
+        id: 'local-session',
+        title: 'Plano reciente en este dispositivo',
+        sketchPreview: localSession.sketchPreview,
+        plan: localSession.analysis,
+      });
+    }
+
+    if (user) {
+      listUserProjects(user.uid)
+        .then((projects) => {
+          projects
+            .filter((project) => project.projectType === 'floor-plan' && project.analysisJson)
+            .forEach((project) => {
+              try {
+                sources.unshift({
+                  id: project.id,
+                  title: project.title,
+                  sketchPreview: project.sketchPreviewUrl || '',
+                  plan: JSON.parse(project.analysisJson!) as FloorPlanAnalysis,
+                });
+              } catch {
+                // ignore invalid saved analysis
+              }
+            });
+
+          setEcoPlanSources(sources);
+          setSelectedEcoPlanId(sources[0]?.id || '');
+        })
+        .catch(() => {
+          setEcoPlanSources(sources);
+          setSelectedEcoPlanId(sources[0]?.id || '');
+        });
+      return;
+    }
+
+    setEcoPlanSources(sources);
+    setSelectedEcoPlanId(sources[0]?.id || '');
+  }, [consultationType, user]);
 
   const revokePreviewUrl = (preview?: string) => {
     if (preview?.startsWith('blob:')) {
@@ -347,22 +420,30 @@ export function NewConsultationPage() {
     navigate('/usuario/analizando');
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const previewForStorage = imageFile ? await fileToDataUrl(imageFile) : imagePreview;
-    const project = {
-      consultationType,
-      description,
-      imagePreview: previewForStorage,
-      roomDetails: null,
-      savedAt: new Date().toISOString(),
-    };
+  const handleEcoAnalyze = async () => {
+    const source = ecoPlanSources.find((item) => item.id === selectedEcoPlanId);
+    if (!source || !hasAnyEcoLayer(ecoLayers)) return;
 
-    window.localStorage.setItem(LAST_PROJECT_KEY, JSON.stringify(project));
-    // Clear previous OpenAI result since this is a normal consultation
-    localStorage.removeItem(LAST_RESULT_KEY);
-    setSavedMessage('Proyecto guardado en este dispositivo.');
-    navigate('/usuario/analizando');
+    setIsEcoAnalyzing(true);
+    setSavedMessage('Generando tu análisis personalizado...');
+
+    try {
+      const analysis = await analyzeEcoPlan(source.plan, ecoNotes || description);
+      saveEcoFriendlySession({
+        sketchPreview: source.sketchPreview,
+        plan: source.plan,
+        analysis,
+        activeLayers: ecoLayers,
+        projectTitle: source.title,
+        savedAt: new Date().toISOString(),
+      });
+      navigate('/usuario/ecofriendly');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'No se pudo completar el análisis.';
+      setSavedMessage(message);
+    } finally {
+      setIsEcoAnalyzing(false);
+    }
   };
 
   return (
@@ -583,33 +664,86 @@ export function NewConsultationPage() {
           )}
         </div>
       ) : (
-        <form className="page-grid sv-consultation-form" onSubmit={handleSubmit}>
-          <UploadCard imagePreview={imagePreview} onImageChange={handleImageChange} />
-
-          <Card className="sv-section-card">
-            <div className="sv-section-heading">
-              <span className="eyebrow">Descripcion</span>
-              <h2>Detalle de la mejora</h2>
-            </div>
-            <label className="textarea-label" htmlFor="problem-description">
-              Describe que deseas mejorar o remodelar
-            </label>
-            <textarea
-              id="problem-description"
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-              placeholder={selectedOption?.placeholder}
-              rows={6}
-            />
-          </Card>
-
-          <div className="sv-form-actions">
-            <Button type="submit" fullWidth>
-              Guardar proyecto
-            </Button>
-            {savedMessage ? <p className="save-message">{savedMessage}</p> : null}
+        <Card className="sv-section-card">
+          <div className="sv-section-heading">
+            <span className="eyebrow">EcoFriendly</span>
+            <h2>Análisis bioclimático en 3D</h2>
+            <p>
+              Elige un plano del historial y marca qué quieres analizar: ventilación, viento, luz
+              o ventanas reflectantes.
+            </p>
           </div>
-        </form>
+
+          <fieldset className="eco-plan-picker">
+            <legend>Plano del historial</legend>
+            <div className="eco-plan-options">
+              {ecoPlanSources.map((source) => (
+                <label
+                  key={source.id}
+                  className={`eco-plan-option${
+                    selectedEcoPlanId === source.id ? ' eco-plan-option-selected' : ''
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="eco-plan"
+                    value={source.id}
+                    checked={selectedEcoPlanId === source.id}
+                    onChange={() => setSelectedEcoPlanId(source.id)}
+                  />
+                  <span>{source.title}</span>
+                  <small>
+                    {source.plan.rooms.length} cuartos · {source.plan.totalWidth}×
+                    {source.plan.totalLength} m
+                  </small>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <EcoLayerPicker
+            layers={ecoLayers}
+            onChange={(layers) => {
+              if (hasAnyEcoLayer(layers)) {
+                setEcoLayers(layers);
+              }
+            }}
+          />
+
+          <div className="input-field">
+            <label htmlFor="eco-notes">Notas sobre orientación o clima (opcional)</label>
+            <textarea
+              id="eco-notes"
+              value={ecoNotes}
+              onChange={(event) => setEcoNotes(event.target.value)}
+              placeholder={selectedOption?.placeholder}
+              rows={4}
+            />
+          </div>
+
+          <div className="sv-form-actions sv-form-actions-stack">
+            <Button
+              type="button"
+              onClick={handleEcoAnalyze}
+              disabled={!selectedEcoPlanId || isEcoAnalyzing || !hasAnyEcoLayer(ecoLayers)}
+              fullWidth
+            >
+              {isEcoAnalyzing ? (
+                <>Generando...</>
+              ) : (
+                <>
+                  <Leaf size={16} /> Generar mi análisis en 3D
+                </>
+              )}
+            </Button>
+            {!user ? (
+              <p className="eco-plan-hint">
+                Inicia sesión para cargar planos guardados en tu historial.
+              </p>
+            ) : null}
+          </div>
+          {savedMessage ? <p className="save-message sv-save-message">{savedMessage}</p> : null}
+        </Card>
       )}
     </div>
   );

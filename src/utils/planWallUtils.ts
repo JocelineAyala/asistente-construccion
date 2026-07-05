@@ -76,3 +76,57 @@ export function normalizeWallDimensions(wall: DetectedWall): DetectedWall {
     length: Math.max(wall.length, 0.2),
   };
 }
+
+/** Muros de respaldo cuando el plano no trae trazado desde boceto (p. ej. demo o historial antiguo). */
+export function buildWallsFromRooms(rooms: FloorPlanRoom[]): DetectedWall[] {
+  const thickness = WALL_DISPLAY_THICKNESS;
+  const walls: DetectedWall[] = [];
+
+  rooms.forEach((room) => {
+    const base = {
+      confidence: 1,
+      zone: room.type,
+    };
+
+    walls.push(
+      {
+        ...base,
+        id: `${room.id}-north`,
+        x: room.x,
+        y: room.y,
+        width: room.width,
+        length: thickness,
+        orientation: 'horizontal',
+      },
+      {
+        ...base,
+        id: `${room.id}-south`,
+        x: room.x,
+        y: room.y + room.length - thickness,
+        width: room.width,
+        length: thickness,
+        orientation: 'horizontal',
+      },
+      {
+        ...base,
+        id: `${room.id}-west`,
+        x: room.x,
+        y: room.y,
+        width: thickness,
+        length: room.length,
+        orientation: 'vertical',
+      },
+      {
+        ...base,
+        id: `${room.id}-east`,
+        x: room.x + room.width - thickness,
+        y: room.y,
+        width: thickness,
+        length: room.length,
+        orientation: 'vertical',
+      },
+    );
+  });
+
+  return ensureWallMetadata(walls, rooms);
+}

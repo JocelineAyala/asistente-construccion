@@ -1976,6 +1976,254 @@ textarea:focus {
   width: 100%;
 }
 
+.eco-friendly-page .eco-friendly-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 1.05fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.eco-friendly-details {
+  display: grid;
+  gap: var(--space-4);
+  max-height: calc(100vh - 12rem);
+  overflow: auto;
+  padding-right: 0.25rem;
+}
+
+.eco-friendly-viewer {
+  position: sticky;
+  top: 1rem;
+}
+
+.eco-viewer-card {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.eco-viewer-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  margin: 0;
+  font-size: 0.86rem;
+}
+
+.eco-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.eco-legend-item::before {
+  content: '';
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+}
+
+.eco-legend-vent::before {
+  background: #38bdf8;
+}
+
+.eco-legend-light::before {
+  background: #fbbf24;
+}
+
+.eco-legend-reflect::before {
+  background: #22d3ee;
+}
+
+.eco-viewer-hint {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #64748b;
+}
+
+.eco-benefit-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.65rem;
+}
+
+.eco-benefit-heading h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.eco-benefit-card p {
+  margin-top: 0;
+}
+
+.eco-point-list {
+  margin: 0.85rem 0 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.eco-benefit-vent .eco-benefit-heading svg {
+  color: #0284c7;
+}
+
+.eco-benefit-light .eco-benefit-heading svg {
+  color: #d97706;
+}
+
+.eco-benefit-reflect .eco-benefit-heading svg {
+  color: #0891b2;
+}
+
+.eco-benefit-energy .eco-benefit-heading svg {
+  color: #059669;
+}
+
+.eco-plan-picker {
+  border: 0;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+}
+
+.eco-plan-picker legend {
+  margin-bottom: 0.75rem;
+  font-weight: 800;
+}
+
+.eco-plan-options {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.eco-plan-option {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(215, 224, 223, 0.95);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.eco-plan-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.eco-plan-option small {
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.eco-plan-option-selected {
+  border-color: rgba(5, 150, 105, 0.55);
+  background: rgba(209, 250, 229, 0.45);
+}
+
+.eco-plan-hint {
+  margin: 0;
+  font-size: 0.86rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.eco-layer-picker {
+  border: 0;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+}
+
+.eco-layer-picker legend {
+  margin-bottom: 0.75rem;
+  font-weight: 800;
+}
+
+.eco-layer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.eco-layer-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgba(215, 224, 223, 0.95);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.eco-layer-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.eco-layer-option-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.14);
+}
+
+.eco-layer-option-copy {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.eco-layer-option-copy small {
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.eco-layer-option-active {
+  border-color: rgba(5, 150, 105, 0.55);
+  background: rgba(209, 250, 229, 0.35);
+}
+
+.eco-layer-option-active.eco-layer-ventilacion .eco-layer-option-icon {
+  color: #0284c7;
+  background: rgba(56, 189, 248, 0.18);
+}
+
+.eco-layer-option-active.eco-layer-viento .eco-layer-option-icon {
+  color: #0369a1;
+  background: rgba(14, 165, 233, 0.16);
+}
+
+.eco-layer-option-active.eco-layer-luz .eco-layer-option-icon {
+  color: #d97706;
+  background: rgba(251, 191, 36, 0.2);
+}
+
+.eco-layer-option-active.eco-layer-ventanas .eco-layer-option-icon {
+  color: #0891b2;
+  background: rgba(34, 211, 238, 0.18);
+}
+
+.eco-layer-card {
+  margin-bottom: var(--space-2);
+}
+
+.eco-benefit-wind .eco-benefit-heading svg {
+  color: #0369a1;
+}
+
+.eco-legend-wind::before {
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
+}
+
+.eco-friendly-model-3d {
+  background: linear-gradient(180deg, #e8f4f0 0%, #f8fafc 100%);
+}
+
 .architectural-floor-plan-2d {
   overflow: hidden;
   border: 1px solid rgba(215, 224, 223, 0.92);
@@ -2873,6 +3121,25 @@ textarea:focus {
 
   .floor-plan-model-3d {
     min-height: 420px;
+  }
+
+  .eco-friendly-page .eco-friendly-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .eco-friendly-details {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .eco-friendly-viewer {
+    position: relative;
+    top: auto;
+  }
+
+  .eco-layer-grid {
+    grid-template-columns: 1fr;
   }
 
   .login-panel {

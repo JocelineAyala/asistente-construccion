@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { EcoFriendlyAnalysis, EcoPlacement, EcoViewLayers, EcoWallSide } from '../../types/ecoAnalysis';
 import { DetectedWall, FloorPlanAnalysis, FloorPlanPoint, FloorPlanRoom } from '../../types/floorPlan';
 import { buildWallsFromRooms } from '../../utils/planWallUtils';
 
-type FloorPlanModel3DProps = {
+type EcoFriendlyModel3DProps = {
   plan: FloorPlanAnalysis;
+  analysis: EcoFriendlyAnalysis;
+  activeLayers: EcoViewLayers;
   sketchPreview?: string;
 };
 
@@ -52,6 +55,41 @@ function getRoomPolygon(room: FloorPlanRoom): FloorPlanPoint[] {
   ];
 }
 
+function getWallPosition(
+  room: FloorPlanRoom,
+  wall: EcoWallSide,
+  offset: number,
+  scale: number,
+  offsetX: number,
+  offsetZ: number,
+) {
+  const t = clamp(offset, 0.05, 0.95);
+  let planX = room.x;
+  let planY = room.y;
+
+  switch (wall) {
+    case 'north':
+      planX = room.x + t * room.width;
+      planY = room.y;
+      break;
+    case 'south':
+      planX = room.x + t * room.width;
+      planY = room.y + room.length;
+      break;
+    case 'west':
+      planX = room.x;
+      planY = room.y + t * room.length;
+      break;
+    case 'east':
+      planX = room.x + room.width;
+      planY = room.y + t * room.length;
+      break;
+  }
+
+  const scene = toScenePoint({ x: planX, y: planY }, scale, offsetX, offsetZ);
+  return { x: scene.x, z: scene.z, wall };
+}
+
 function addWallMesh(
   group: THREE.Group,
   wall: DetectedWall,
@@ -87,7 +125,186 @@ function addWallMesh(
   group.add(mesh);
 }
 
-export function FloorPlanModel3D({ plan, sketchPreview }: FloorPlanModel3DProps) {
+function addEcoMarker(
+  group: THREE.Group,
+  room: FloorPlanRoom,
+  placement: EcoPlacement,
+  kind: 'ventilation' | 'light' | 'reflective',
+  scale: number,
+  offsetX: number,
+  offsetZ: number,
+  wallHeight: number,
+) {
+  const { x, z, wall } = getWallPosition(room, placement.wall, placement.offset, scale, offsetX, offsetZ);
+  const markerGroup = new THREE.Group();
+  const panelWidth = 0.55;
+  const panelHeight = 0.42;
+  const yCenter = wallHeight * 0.52;
+
+  let panelColor = 0x38bdf8;
+  let emissive = 0x0ea5e9;
+  let metalness = 0.1;
+  let roughness = 0.35;
+
+  if (kind === 'light') {
+    panelColor = 0xfbbf24;
+    emissive = 0xf59e0b;
+  } else if (kind === 'reflective') {
+    panelColor = 0x67e8f9;
+    emissive = 0x22d3ee;
+    metalness = 0.85;
+    roughness = 0.08;
+  }
+
+  const panel = new THREE.Mesh(
+    new THREE.PlaneGeometry(panelWidth, panelHeight),
+    new THREE.MeshStandardMaterial({
+      color: panelColor,
+      emissive,
+      emissiveIntensity: kind === 'reflective' ? 0.35 : 0.55,
+      metalness,
+      roughness,
+      transparent: true,
+      opacity: 0.92,
+      side: THREE.DoubleSide,
+    }),
+  );
+
+  const depth = 0.06;
+  if (wall === 'north') {
+    panel.position.set(x, yCenter, z - depth);
+  } else if (wall === 'south') {
+    panel.position.set(x, yCenter, z + depth);
+  } else if (wall === 'west') {
+    panel.rotation.y = Math.PI / 2;
+    panel.position.set(x - depth, yCenter, z);
+  } else {
+    panel.rotation.y = -Math.PI / 2;
+    panel.position.set(x + depth, yCenter, z);
+  }
+
+  markerGroup.add(panel);
+
+  if (kind === 'ventilation') {
+    const arrow = new THREE.Mesh(
+      new THREE.ConeGeometry(0.12, 0.28, 8),
+      new THREE.MeshStandardMaterial({ color: 0x0284c7, emissive: 0x0284c7, emissiveIntensity: 0.4 }),
+    );
+    arrow.rotation.z = -Math.PI / 2;
+    arrow.position.set(x, yCenter + 0.55, z);
+    markerGroup.add(arrow);
+
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(0.18, 0.28, 24),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.45, side: THREE.DoubleSide }),
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.set(x, 0.06, z);
+    markerGroup.add(ring);
+  }
+
+  if (kind === 'light') {
+    const beam = new THREE.Mesh(
+      new THREE.ConeGeometry(0.35, 1.1, 16, 1, true),
+      new THREE.MeshBasicMaterial({
+        color: 0xfde68a,
+        transparent: true,
+        opacity: 0.22,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      }),
+    );
+    beam.position.set(x, yCenter - 0.35, z);
+    markerGroup.add(beam);
+
+    const glow = new THREE.PointLight(0xfbbf24, 0.85, 2.8);
+    glow.position.set(x, yCenter + 0.2, z);
+    markerGroup.add(glow);
+  }
+
+  if (kind === 'reflective') {
+    const sunBlock = new THREE.Mesh(
+      new THREE.CircleGeometry(0.2, 24),
+      new THREE.MeshBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.35 }),
+    );
+    sunBlock.position.set(x, yCenter + 0.75, z - 0.5);
+    markerGroup.add(sunBlock);
+
+    const bounce = new THREE.ArrowHelper(
+      new THREE.Vector3(0, 0.3, 0.5).normalize(),
+      new THREE.Vector3(x, yCenter + 0.75, z - 0.45),
+      0.5,
+      0xf97316,
+      0.12,
+      0.08,
+    );
+    markerGroup.add(bounce);
+  }
+
+  group.add(markerGroup);
+}
+
+function addWindFlows(
+  group: THREE.Group,
+  plan: FloorPlanAnalysis,
+  analysis: EcoFriendlyAnalysis,
+  scale: number,
+  offsetX: number,
+  offsetZ: number,
+) {
+  const roomById = new Map(plan.rooms.map((room) => [room.id, room]));
+  const processedRooms = new Set<string>();
+
+  analysis.ventilationPoints.forEach((point, index) => {
+    if (processedRooms.has(point.roomId)) return;
+
+    const room = roomById.get(point.roomId);
+    if (!room) return;
+
+    const roomVents = analysis.ventilationPoints.filter((item) => item.roomId === point.roomId);
+    const start = roomVents[0];
+    const end = roomVents.find(
+      (item) =>
+        item.id !== start.id &&
+        ((item.wall === 'north' && start.wall === 'south') ||
+          (item.wall === 'south' && start.wall === 'north') ||
+          (item.wall === 'east' && start.wall === 'west') ||
+          (item.wall === 'west' && start.wall === 'east')),
+    );
+
+    const from = start;
+    const to = end ?? roomVents[1] ?? start;
+
+    const fromPos = getWallPosition(room, from.wall, from.offset, scale, offsetX, offsetZ);
+    const toPos = getWallPosition(room, to.wall, to.offset, scale, offsetX, offsetZ);
+
+    const startVec = new THREE.Vector3(fromPos.x, 0.35, fromPos.z);
+    const endVec = new THREE.Vector3(toPos.x, 0.35, toPos.z);
+    const midVec = startVec.clone().lerp(endVec, 0.5);
+    midVec.y += 0.25 + index * 0.02;
+
+    const curve = new THREE.QuadraticBezierCurve3(startVec, midVec, endVec);
+    const points = curve.getPoints(20);
+    const line = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(points),
+      new THREE.LineBasicMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.75 }),
+    );
+    group.add(line);
+
+    const direction = endVec.clone().sub(startVec).normalize();
+    const arrow = new THREE.ArrowHelper(direction, midVec, 0.45, 0x0284c7, 0.14, 0.1);
+    group.add(arrow);
+
+    processedRooms.add(point.roomId);
+  });
+}
+
+export function EcoFriendlyModel3D({
+  plan,
+  analysis,
+  activeLayers,
+  sketchPreview,
+}: EcoFriendlyModel3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -101,10 +318,10 @@ export function FloorPlanModel3D({ plan, sketchPreview }: FloorPlanModel3DProps)
     if (!container || (!hasRooms && detectedWalls.length === 0)) return undefined;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xeef2f6);
+    scene.background = new THREE.Color(0xe8f4f0);
 
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.set(7.8, 7.2, 8.8);
+    camera.position.set(7.8, 7.4, 8.8);
     camera.lookAt(0, 1.1, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -113,22 +330,25 @@ export function FloorPlanModel3D({ plan, sketchPreview }: FloorPlanModel3DProps)
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1.25));
-    scene.add(new THREE.HemisphereLight(0xffffff, 0xd7e0df, 0.55));
+    scene.add(new THREE.AmbientLight(0xffffff, 1.1));
+    scene.add(new THREE.HemisphereLight(0xfff7ed, 0xd7e0df, 0.65));
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
-    keyLight.position.set(8, 12, 6);
-    keyLight.castShadow = true;
-    scene.add(keyLight);
+    const sunLight = new THREE.DirectionalLight(0xffedd5, 1.35);
+    sunLight.position.set(10, 14, 4);
+    sunLight.castShadow = true;
+    scene.add(sunLight);
 
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.45);
     fillLight.position.set(-6, 5, -4);
     scene.add(fillLight);
 
     const planGroup = new THREE.Group();
+    const ecoGroup = new THREE.Group();
     const scale = getPlanScale(plan);
     const { offsetX, offsetZ } = getPlanOffsets(plan, scale);
     const wallHeight = clamp(plan.ceilingHeight * 0.55, 1.0, 1.8);
+
+    const roomById = new Map(plan.rooms.map((room) => [room.id, room]));
 
     const slab = new THREE.Mesh(
       new THREE.BoxGeometry(plan.totalWidth * scale + 0.4, 0.05, plan.totalLength * scale + 0.4),
@@ -207,6 +427,31 @@ export function FloorPlanModel3D({ plan, sketchPreview }: FloorPlanModel3DProps)
       addWallMesh(planGroup, wall, scale, offsetX, offsetZ, wallHeight);
     });
 
+    const addPlacements = (
+      placements: EcoPlacement[],
+      kind: 'ventilation' | 'light' | 'reflective',
+    ) => {
+      placements.forEach((placement) => {
+        const room = roomById.get(placement.roomId);
+        if (!room) return;
+        addEcoMarker(ecoGroup, room, placement, kind, scale, offsetX, offsetZ, wallHeight);
+      });
+    };
+
+    if (activeLayers.ventilacion) {
+      addPlacements(analysis.ventilationPoints, 'ventilation');
+    }
+    if (activeLayers.luz) {
+      addPlacements(analysis.lightPoints, 'light');
+    }
+    if (activeLayers.ventanas) {
+      addPlacements(analysis.reflectiveWindows, 'reflective');
+    }
+    if (activeLayers.viento) {
+      addWindFlows(ecoGroup, plan, analysis, scale, offsetX, offsetZ);
+    }
+
+    planGroup.add(ecoGroup);
     planGroup.rotation.y = -0.4;
     scene.add(planGroup);
 
@@ -269,13 +514,13 @@ export function FloorPlanModel3D({ plan, sketchPreview }: FloorPlanModel3DProps)
         container.removeChild(renderer.domElement);
       }
     };
-  }, [plan, sketchPreview]);
+  }, [plan, analysis, activeLayers, sketchPreview]);
 
   return (
     <div
-      className="floor-plan-model-3d"
+      className="floor-plan-model-3d eco-friendly-model-3d"
       ref={containerRef}
-      aria-label="Modelo 3D del plano interpretado"
+      aria-label="Modelo 3D ecofriendly con ventilación, luz y ventanas reflectantes"
     />
   );
 }

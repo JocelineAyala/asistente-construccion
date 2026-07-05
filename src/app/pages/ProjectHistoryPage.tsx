@@ -4,8 +4,9 @@ import { Clock3, FolderOpen, PencilRuler, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { PageTitle } from '../../components/common/PageTitle';
 import { Card } from '../../components/ui/Card';
-import { listUserProjects } from '../../services/projectService';
+import { listUserProjects, isProjectCloudStorageEnabled } from '../../services/projectService';
 import { SavedProject } from '../../types/project';
+import { isFirebaseConfigured } from '../../lib/firebase';
 
 const PROJECT_TYPE_LABELS: Record<SavedProject['projectType'], string> = {
   'floor-plan': 'Plano arquitectónico',
@@ -65,8 +66,26 @@ export function ProjectHistoryPage() {
         <p>
           Proyectos guardados para <strong>{user.email}</strong>
           {user.provider === 'google' ? ' (Google)' : ' (modo local)'}.
+          {!isProjectCloudStorageEnabled() ? (
+            <>
+              {' '}
+              Los datos están en este navegador; conecta Firebase en <code>.env</code> para
+              sincronizar con tu base de datos.
+            </>
+          ) : null}
         </p>
       </PageTitle>
+
+      {!isFirebaseConfigured() ? (
+        <Card className="sv-section-card project-history-storage-note">
+          <p>
+            <strong>Firebase no está configurado.</strong> El historial guarda el boceto y las
+            medidas del plano (no un archivo 3D aparte) en el almacenamiento local del navegador.
+            Debes pulsar <strong>Guardar proyecto</strong> en el mapeo del plano después de
+            analizar.
+          </p>
+        </Card>
+      ) : null}
 
       {errorMessage ? <p className="plan-error-message">{errorMessage}</p> : null}
 

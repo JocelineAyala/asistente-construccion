@@ -20,7 +20,7 @@ import {
 import { fileToBase64, fileToDataUrl, isOpenAiConfigured } from '../../utils/openai';
 import { getConfiguredPipelineLabels } from '../../config/floorPlanApis';
 import { runSketchEnhancementPipeline } from '../../services/floorPlanPipeline';
-import { getUserProject, saveUserProject } from '../../services/projectService';
+import { getUserProject, isProjectCloudStorageEnabled, saveUserProject } from '../../services/projectService';
 import { exportFloorPlanPdf } from '../../utils/exportFloorPlanPdf';
 import { buildPlanFromSketch, preprocessSketch } from '../../utils/sketchGeometry';
 import { ensureWallMetadata } from '../../utils/planWallUtils';
@@ -232,10 +232,14 @@ export function PlanMappingPage() {
         analysisJson: JSON.stringify(analysis),
         summary: analysis.summary,
       });
-      setSaveMessage('Proyecto guardado. Puedes verlo en Historial.');
+      setSaveMessage(
+        isProjectCloudStorageEnabled()
+          ? 'Proyecto guardado en Firebase. Ábrelo desde Historial.'
+          : 'Proyecto guardado en este navegador. Configura VITE_FIREBASE_* en .env para usar tu base de datos.',
+      );
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'No se pudo guardar el proyecto.';
-      setRecalculateError(message);
+      setSaveMessage(message);
     } finally {
       setIsSavingProject(false);
     }
