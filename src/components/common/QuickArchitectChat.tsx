@@ -34,7 +34,7 @@ export function QuickArchitectChat() {
   const [showKey, setShowKey] = useState(false);
   const [isKeySaved, setIsKeySaved] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Load API key from localStorage on mount
   useEffect(() => {
@@ -43,9 +43,15 @@ export function QuickArchitectChat() {
     setTempKey(savedKey);
   }, []);
 
-  // Auto-scroll to the bottom of chat history when messages change
+  // Auto-scroll only inside the chat panel, not the whole page
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: 'smooth',
+    });
   }, [messages, isLoading]);
 
   const handleSaveSettings = (e: FormEvent) => {
@@ -258,7 +264,7 @@ export function QuickArchitectChat() {
         </div>
       ) : null}
 
-      <div className="chat-messages">
+      <div className="chat-messages" ref={messagesContainerRef}>
         {messages.map((message) => (
           <div
             key={message.id}
@@ -299,7 +305,6 @@ export function QuickArchitectChat() {
             </div>
           </div>
         ) : null}
-        <div ref={messagesEndRef} />
       </div>
 
       <div className="chat-input-form">
