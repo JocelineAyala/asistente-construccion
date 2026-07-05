@@ -13,6 +13,8 @@
     "@rollup/rollup-win32-x64-msvc": "^4.62.2",
     "@types/three": "^0.185.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "firebase": "^12.15.0",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

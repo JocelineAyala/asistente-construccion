@@ -11,9 +11,14 @@ const sidebarItems = [
   { icon: UsersRound, label: 'Perfil', path: '/seleccion-perfil' },
 ];
 
-export function Sidebar() {
+type SidebarProps = {
+  isOpen?: boolean;
+  onClose?: () => void;
+};
+
+export function Sidebar({ isOpen = true }: SidebarProps) {
   return (
-    <aside className="sv-sidebar">
+    <aside className={`sv-sidebar${isOpen ? '' : ' sv-sidebar-closed'}`}>
       <img className="sv-sidebar-bottom" src={sidebarBottom} alt="" aria-hidden="true" />
       <img className="sv-sidebar-pattern" src={mayanPattern} alt="" aria-hidden="true" />
 
@@ -31,7 +36,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <p className="sv-sidebar-note">Prototipo visual para asistencia de construcción del hogar.</p>
+      <p className="sv-sidebar-note">Prototipo visual para asistencia en construcción y edificación.</p>
     </aside>
   );
 }
