@@ -12,7 +12,7 @@ export function ProfileSelectionPage() {
       <section className="profile-selector-grid" aria-label="Tipos de perfil">
         <ProfileCard
           title="Usuario normal"
-          description="Para resolver necesidades del hogar con consultas simples, fotos y recomendaciones guiadas."
+          description="Para resolver necesidades de construcción y edificación con consultas simples, fotos y recomendaciones guiadas."
           icon={UserRound}
           to="/home/usuario"
           tone="normal"

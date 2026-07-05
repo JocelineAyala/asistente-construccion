@@ -7,7 +7,10 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { NewConsultationPage } from './pages/NewConsultationPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { PlanMappingPage } from './pages/PlanMappingPage';
 import { ProfileSelectionPage } from './pages/ProfileSelectionPage';
+import { ProjectHistoryPage } from './pages/ProjectHistoryPage';
+import { EcoFriendlyPage } from './pages/EcoFriendlyPage';
 import { ResultsPage } from './pages/ResultsPage';
 import { UserPlaceholderPage } from './pages/UserPlaceholderPage';
 
@@ -36,6 +39,10 @@ export const router = createBrowserRouter([
         element: <NewConsultationPage />,
       },
       {
+        path: '/usuario/dibujar-plano',
+        element: <PlanMappingPage />,
+      },
+      {
         path: '/usuario/analizando',
         element: <AnalyzingPage />,
       },
@@ -44,13 +51,12 @@ export const router = createBrowserRouter([
         element: <ResultsPage />,
       },
       {
+        path: '/usuario/ecofriendly',
+        element: <EcoFriendlyPage />,
+      },
+      {
         path: '/usuario/historial',
-        element: (
-          <UserPlaceholderPage
-            title="Historial"
-            description="Aquí se mostrarán las consultas realizadas por el usuario."
-          />
-        ),
+        element: <ProjectHistoryPage />,
       },
       {
         path: '/usuario/materiales-sugeridos',
@@ -58,15 +64,6 @@ export const router = createBrowserRouter([
           <UserPlaceholderPage
             title="Materiales sugeridos"
             description="Esta sección se alimentará con los materiales generados al analizar una consulta."
-          />
-        ),
-      },
-      {
-        path: '/usuario/ferreterias-cercanas',
-        element: (
-          <UserPlaceholderPage
-            title="Ferreterías cercanas"
-            description="Aquí se listarán comercios cercanos cuando se conecte la ubicación."
           />
         ),
       },
