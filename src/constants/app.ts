@@ -1,1 +1,1 @@
-export const APP_NAME = 'Asistente Construccion';
+export const APP_NAME = 'Asistente Construcción';

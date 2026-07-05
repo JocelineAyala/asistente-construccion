@@ -1,34 +1,37 @@
 import { NavLink } from 'react-router-dom';
-import { BriefcaseBusiness, Home, UsersRound } from 'lucide-react';
+import { Clock3, Home, Plus, UsersRound } from 'lucide-react';
+import mayanPattern from '../../assets/sidebar/mayan-pattern.svg';
+import sidebarBottom from '../../assets/sidebar/sidebar-bottom.svg';
 import { APP_NAME } from '../../constants/app';
-import { NAV_ITEMS } from '../../constants/navigation';
 
-const iconMap = {
-  home: Home,
-  professional: BriefcaseBusiness,
-  selector: UsersRound,
-};
+const sidebarItems = [
+  { icon: Home, label: 'Inicio', path: '/home/usuario' },
+  { icon: Plus, label: 'Nueva consulta', path: '/usuario/nueva-consulta' },
+  { icon: Clock3, label: 'Historial', path: '/usuario/historial' },
+  { icon: UsersRound, label: 'Perfil', path: '/seleccion-perfil' },
+];
 
 export function Sidebar() {
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <img src="/src/assets/logo.svg" alt="" className="brand-mark small" />
+    <aside className="sv-sidebar">
+      <img className="sv-sidebar-bottom" src={sidebarBottom} alt="" aria-hidden="true" />
+      <img className="sv-sidebar-pattern" src={mayanPattern} alt="" aria-hidden="true" />
+
+      <div className="sv-sidebar-brand">
+        <img src="/src/assets/logo.svg" alt="" className="sv-sidebar-logo" />
         <span>{APP_NAME}</span>
       </div>
 
-      <nav className="sidebar-nav" aria-label="Navegacion principal">
-        {NAV_ITEMS.map((item) => {
-          const Icon = iconMap[item.icon];
-
-          return (
-            <NavLink key={item.path} to={item.path} className="sidebar-link">
-              <Icon size={18} />
-              <span>{item.label}</span>
-            </NavLink>
-          );
-        })}
+      <nav className="sv-sidebar-nav" aria-label="Navegación principal">
+        {sidebarItems.map(({ icon: Icon, label, path }) => (
+          <NavLink key={path} to={path} className="sv-sidebar-link">
+            <Icon size={24} strokeWidth={1.9} />
+            <span>{label}</span>
+          </NavLink>
+        ))}
       </nav>
+
+      <p className="sv-sidebar-note">Prototipo visual para asistencia de construcción del hogar.</p>
     </aside>
   );
 }
