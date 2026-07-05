@@ -22,7 +22,7 @@ export function QuickArchitectChat() {
       id: 'welcome',
       role: 'assistant',
       content:
-        '¡Hola! Soy tu asistente rápido de arquitectura y construcción. ¿Tienes alguna pregunta sobre materiales, ventilación, temperatura, albañilería o diseño? Pregúntame lo que necesites.',
+        '¡Hola! Soy tu asesor arquitectónico. Puedo ayudarte con construcción, remodelación, materiales, reparaciones y diseño de espacios. ¿Qué consulta necesitas hoy?',
       timestamp: new Date(),
     },
   ]);
@@ -34,7 +34,7 @@ export function QuickArchitectChat() {
   const [showKey, setShowKey] = useState(false);
   const [isKeySaved, setIsKeySaved] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Load API key from localStorage on mount
   useEffect(() => {
@@ -43,9 +43,15 @@ export function QuickArchitectChat() {
     setTempKey(savedKey);
   }, []);
 
-  // Auto-scroll to the bottom of chat history when messages change
+  // Auto-scroll only inside the chat panel, not the whole page
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: 'smooth',
+    });
   }, [messages, isLoading]);
 
   const handleSaveSettings = (e: FormEvent) => {
@@ -109,7 +115,7 @@ export function QuickArchitectChat() {
       lowerQuery.includes('estructura') ||
       lowerQuery.includes('cargar')
     ) {
-      return `**¡Advertencia estructural!** Las vigas, columnas y muros de carga son esenciales para la estabilidad de tu hogar:\n\n- **Regla de oro**: Nunca piques o elimines partes de una columna o viga existente para pasar tuberías, esto debilita gravemente la estructura.\n- **Muros portantes**: En viviendas de mampostería confinada, no realices ranuras horizontales largas en los ladrillos; esto puede comprometer el soporte ante un sismo.\n- Consulta siempre con un calculista o ingeniero civil antes de demoler un muro si no estás seguro de si es de carga.`;
+      return `**¡Advertencia estructural!** Las vigas, columnas y muros de carga son esenciales para la estabilidad de tu edificación:\n\n- **Regla de oro**: Nunca piques o elimines partes de una columna o viga existente para pasar tuberías, esto debilita gravemente la estructura.\n- **Muros portantes**: En edificaciones de mampostería confinada, no realices ranuras horizontales largas en los ladrillos; esto puede comprometer el soporte ante un sismo.\n- Consulta siempre con un calculista o ingeniero civil antes de demoler un muro si no estás seguro de si es de carga.`;
     }
 
     return `Es una consulta muy interesante. Desde el punto de vista arquitectónico y constructivo:\n\n1. **Distribución**: Optimiza siempre la entrada de luz natural situando las zonas sociales (sala, comedor) hacia donde haya mayor iluminación solar diurna.\n2. **Materiales**: Elige materiales locales. Tienen un menor costo logístico y están adaptados al clima de tu región.\n3. **Normas**: Respeta siempre las alturas mínimas requeridas para ventilación y habitabilidad en tu área (usualmente de 2.40m a 2.60m).\n\n¿Deseas profundizar en algún detalle específico de tu obra?`;
@@ -176,7 +182,7 @@ export function QuickArchitectChat() {
               {
                 role: 'system',
                 content:
-                  'Eres un asistente de arquitectura, diseño de interiores y construcción de hogares experto. Respondes en español de forma profesional, clara, directa y estructurada con consejos prácticos aplicables a autoconstrucción o remodelación.',
+                  'Eres el asesor arquitectónico personal del usuario en una app de asistencia en construcción y edificación. Respondes en español de forma profesional, clara y cercana, con consejos prácticos de arquitectura, construcción, remodelación y materiales. Si la consulta es amplia, pregunta qué necesita resolver antes de dar recomendaciones.',
               },
               ...recentMessages,
             ],
@@ -224,8 +230,8 @@ export function QuickArchitectChat() {
         <div className="chat-header-title">
           <Sparkles className="chat-sparkles-icon" size={16} />
           <div>
-            <h3>Consultas Rápidas de IA</h3>
-            <span className="chat-subtitle">Asesoría de arquitectura y construcción al instante</span>
+            <h3>Tu asesor arquitectónico</h3>
+            <span className="chat-subtitle">Cuéntame qué consulta necesitas</span>
           </div>
         </div>
 
@@ -258,7 +264,7 @@ export function QuickArchitectChat() {
         </div>
       ) : null}
 
-      <div className="chat-messages">
+      <div className="chat-messages" ref={messagesContainerRef}>
         {messages.map((message) => (
           <div
             key={message.id}
@@ -299,14 +305,13 @@ export function QuickArchitectChat() {
             </div>
           </div>
         ) : null}
-        <div ref={messagesEndRef} />
       </div>
 
       <div className="chat-input-form">
         <input
           type="text"
           className="chat-input-field"
-          placeholder="Pregunta sobre materiales, muros, vigas..."
+          placeholder="¿Qué consulta necesitas? Ej.: reparar una pared, elegir materiales..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {

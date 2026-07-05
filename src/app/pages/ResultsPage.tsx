@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { HardwareStoreCard } from '../../components/common/HardwareStoreCard';
 import { MaterialCard } from '../../components/common/MaterialCard';
 import { PageTitle } from '../../components/common/PageTitle';
 import { SectionTitle } from '../../components/common/SectionTitle';
@@ -7,12 +6,7 @@ import { StepCard } from '../../components/common/StepCard';
 import { VideoCard } from '../../components/common/VideoCard';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import {
-  MOCK_HARDWARE_STORES,
-  MOCK_MATERIALS,
-  MOCK_STEPS,
-  MOCK_VIDEOS,
-} from '../../constants/mockResults';
+import { MOCK_MATERIALS, MOCK_STEPS, MOCK_VIDEOS } from '../../constants/mockResults';
 
 export function ResultsPage() {
   const rawResult = localStorage.getItem('buildassist:last-result');
@@ -32,7 +26,6 @@ export function ResultsPage() {
   const materials = result?.materials || MOCK_MATERIALS;
   const steps = result?.steps || MOCK_STEPS;
   const videos = result?.videos || MOCK_VIDEOS;
-  const hardwareStores = result?.hardwareStores || MOCK_HARDWARE_STORES;
 
   const rawProject = localStorage.getItem('buildassist:last-project');
   let project = null;
@@ -114,15 +107,6 @@ export function ResultsPage() {
         <div className="video-grid">
           {videos.map((video: any) => (
             <VideoCard key={video.title} {...video} />
-          ))}
-        </div>
-      </section>
-
-      <section className="page-grid" id="ferreterias">
-        <SectionTitle title="Ferreterías cercanas" />
-        <div className="hardware-grid">
-          {hardwareStores.map((store: any) => (
-            <HardwareStoreCard key={store.name} {...store} />
           ))}
         </div>
       </section>
