@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plano3D - Analisis de planos</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Plano3D</h1>
+    <p class="sub">Sube un plano -> backend IA -> modelo 3D + materiales</p>
+  </header>
+
+  <main>
+    <section class="panel controls-accordion" id="controls">
+      <details class="control-group" open>
+        <summary>Plano</summary>
+        <div class="step">
+          <h2>1. Sube tu plano</h2>
+          <input type="file" id="fileInput" accept="image/*" />
+          <p class="hint">JPG, PNG o captura de un plano. El backend procesa todo.</p>
+        </div>
+        <div class="step">
+          <h2>2. Analizar con backend</h2>
+          <button id="detectBtn" disabled>Analizar plano</button>
+          <p class="status" id="cvStatus">Selecciona una imagen para comenzar.</p>
+          <div class="progress-list" id="progressList" aria-live="polite"></div>
+        </div>
+      </details>
+
+      <details class="control-group">
+        <summary>Muros</summary>
+        <div class="step">
+          <h2>Altura visual de muros (m)</h2>
+          <input type="range" id="wallHeight" min="2" max="4" step="0.1" value="2.6" />
+          <span id="wallHeightVal">2.6 m</span>
+        </div>
+        <div class="step">
+          <h2>Editor manual</h2>
+          <div class="tool-row" role="group" aria-label="Editor de muros">
+            <button id="selectTool" class="secondary active" type="button">Ver</button>
+            <button id="addWallTool" class="secondary" type="button">Agregar</button>
+            <button id="deleteWallTool" class="secondary" type="button">Quitar</button>
+          </div>
+          <div class="tool-row">
+            <button id="undoEditBtn" class="secondary" type="button" disabled>Deshacer</button>
+            <button id="clearWallsBtn" class="secondary" type="button" disabled>Vaciar</button>
+          </div>
+          <p class="hint" id="editorHint">Ver: haz clic en un muro para seleccionarlo (Supr para borrarlo).</p>
+        </div>
+      </details>
+
+      <details class="control-group">
+        <summary>Ventanas y puertas</summary>
+        <div class="step">
+          <h2>Aberturas</h2>
+          <div class="tool-row" role="group" aria-label="Aberturas">
+            <button id="windowTool" class="secondary" type="button">Ventana</button>
+            <button id="doorTool" class="secondary" type="button">Puerta</button>
+          </div>
+          <div class="tool-row">
+            <button id="rotateDoorBtn" class="secondary" type="button" disabled>Rotar ultima puerta</button>
+            <button id="flipDoorHingeBtn" class="secondary" type="button" disabled>Cambiar pared</button>
+            <button id="doorClearanceBtn" class="secondary" type="button" disabled>Mover puerta</button>
+          </div>
+          <p class="hint">Clic sobre un muro (en el 3D) para colocar. La ventana va de izquierda a derecha.</p>
+          <label>Ancho ventana
+            <input type="range" id="winW" min="0.5" max="2.5" step="0.1" value="1.1" />
+            <span id="winWVal">1.1 m</span>
+          </label>
+          <label>Alto ventana
+            <input type="range" id="winH" min="0.4" max="2.0" step="0.1" value="1.1" />
+            <span id="winHVal">1.1 m</span>
+          </label>
+          <label>Altura de repisa (sill)
+            <input type="range" id="sill" min="0.2" max="1.8" step="0.1" value="0.9" />
+            <span id="sillVal">0.9 m</span>
+          </label>
+          <label>Ancho puerta
+            <input type="range" id="doorW" min="0.6" max="1.6" step="0.1" value="0.9" />
+            <span id="doorWVal">0.9 m</span>
+          </label>
+        </div>
+      </details>
+
+      <details class="control-group">
+        <summary>Confort y analisis</summary>
+        <div class="step">
+          <h2>Aire acondicionado</h2>
+          <div class="tool-row" role="group" aria-label="Herramientas profesionales">
+            <button id="acTool" class="secondary" type="button">Mejor posicion A/C</button>
+            <button id="acManualTool" class="secondary" type="button">Colocar A/C</button>
+          </div>
+          <div class="efficiency-meter" aria-label="Eficiencia de aire acondicionado">
+            <div class="efficiency-row">
+              <span>Eficiencia</span>
+              <b id="acEfficiencyVal">0%</b>
+            </div>
+            <div class="efficiency-track"><div id="acEfficiencyFill" class="efficiency-fill"></div></div>
+          </div>
+          <p class="hint" id="acHint">Calcula el mejor muro para minisplit evitando puertas y ventanas.</p>
+        </div>
+        <div class="step">
+          <h2>Analisis del hogar</h2>
+          <div class="north-picker" role="group" aria-label="Norte del plano">
+            <button class="secondary active" type="button" data-north="N">N</button>
+            <button class="secondary" type="button" data-north="E">E</button>
+            <button class="secondary" type="button" data-north="S">S</button>
+            <button class="secondary" type="button" data-north="W">O</button>
+          </div>
+          <p class="mini-label">Viento desde</p>
+          <div class="wind-picker" role="group" aria-label="Direccion del viento">
+            <button class="secondary" type="button" data-wind-from="N">N</button>
+            <button class="secondary active" type="button" data-wind-from="E">E</button>
+            <button class="secondary" type="button" data-wind-from="S">S</button>
+            <button class="secondary" type="button" data-wind-from="W">O</button>
+          </div>
+          <div class="overlay-picker" role="group" aria-label="Capa de confort">
+            <button class="secondary" type="button" data-comfort-layer="sun">Sol</button>
+            <button class="secondary" type="button" data-comfort-layer="wind">Viento</button>
+            <button class="secondary active" type="button" data-comfort-layer="both">Ambos</button>
+          </div>
+          <div id="homeAnalysisSummary" class="analysis-summary">
+            Analiza un plano y agrega ventanas para ver asoleamiento, ventilacion y aislamiento.
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="viewers">
+      <div class="viewer-box">
+        <h3>Plano procesado</h3>
+        <canvas id="planCanvas"></canvas>
+      </div>
+      <div class="viewer-box">
+        <div class="viewer-title-row">
+          <h3>Modelo 3D</h3>
+          <button id="roofToggleBtn" class="secondary compact" type="button">Quitar techo</button>
+        </div>
+        <div id="scene3d"></div>
+      </div>
+    </section>
+
+    <aside class="panel" id="carbonPanel">
+      <h2>Materiales</h2>
+      <div id="carbonStats"></div>
+      <h3>Muros con cota</h3>
+      <ul id="carbonTips"></ul>
+    </aside>
+  </main>
+
+  <script async src="https://docs.opencv.org/4.9.0/opencv.js" onload="window.__cvReady && window.__cvReady()"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1696,6 +1696,141 @@ textarea:focus {
   color: #11413b;
 }
 
+.professional-plano3d-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: clamp(var(--space-5), 3vw, var(--space-6));
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(70, 168, 239, 0.08)),
+    #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.professional-plano3d-copy {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 54rem;
+}
+
+.professional-plano3d-icon {
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  color: #087668;
+  background: #dff4ef;
+  border-radius: var(--radius-md);
+}
+
+.professional-plano3d-copy h2 {
+  margin: var(--space-1) 0 var(--space-2);
+  font-size: clamp(1.55rem, 2vw, 2.15rem);
+}
+
+.professional-plano3d-copy p:last-child {
+  max-width: 46rem;
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.professional-plano3d-button {
+  flex: 0 0 auto;
+}
+
+.plano3d-shell-page {
+  gap: var(--space-5);
+}
+
+.plano3d-tool-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.plano3d-tool-copy {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  max-width: 54rem;
+  gap: var(--space-4);
+}
+
+.plano3d-tool-copy h1 {
+  margin: var(--space-1) 0 var(--space-2);
+  font-size: clamp(2rem, 4vw, 3.8rem);
+}
+
+.plano3d-tool-icon {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  color: #087668;
+  background: #dff4ef;
+  border-radius: var(--radius-md);
+}
+
+.plano3d-tool-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.plano3d-launch-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: clamp(var(--space-5), 3vw, var(--space-8));
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.09), rgba(166, 221, 8, 0.1)),
+    #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.plano3d-launch-card h2 {
+  margin: var(--space-1) 0 var(--space-2);
+  font-size: clamp(1.45rem, 2.2vw, 2.4rem);
+}
+
+.plano3d-launch-card p:last-child {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.plano3d-frame-card {
+  overflow: hidden;
+  min-height: min(74vh, 52rem);
+  background: #071018;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.plano3d-frame {
+  display: block;
+  width: 100%;
+  min-height: min(74vh, 52rem);
+  border: 0;
+  background: #071018;
+}
+
 .user-home-orange-blob,
 .user-home-blue-blob {
   position: absolute;
@@ -1868,6 +2003,26 @@ textarea:focus {
   .user-home-hero,
   .user-home-card-grid {
     grid-template-columns: 1fr;
+  }
+
+  .plano3d-tool-header {
+    display: grid;
+  }
+
+  .plano3d-tool-actions {
+    justify-content: flex-start;
+  }
+
+  .plano3d-launch-card {
+    display: grid;
+  }
+
+  .professional-plano3d-entry {
+    display: grid;
+  }
+
+  .professional-plano3d-button {
+    width: 100%;
   }
 
   .user-home-illustration {

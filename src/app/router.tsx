@@ -7,6 +7,7 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { NewConsultationPage } from './pages/NewConsultationPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { Plano3DToolPage } from './pages/Plano3DToolPage';
 import { ProfileSelectionPage } from './pages/ProfileSelectionPage';
 import { ResultsPage } from './pages/ResultsPage';
 import { UserPlaceholderPage } from './pages/UserPlaceholderPage';
@@ -73,6 +74,10 @@ export const router = createBrowserRouter([
       {
         path: '/home/profesional',
         element: <HomeProfessionalPage />,
+      },
+      {
+        path: '/home/profesional/plano3d',
+        element: <Plano3DToolPage />,
       },
     ],
   },
