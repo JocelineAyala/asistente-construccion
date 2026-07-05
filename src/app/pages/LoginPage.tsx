@@ -32,7 +32,7 @@ export function LoginPage() {
 
         <Card className="login-card">
           <div className="section-heading">
-            <h2>Inicia sesion</h2>
+            <h2>Inicia sesión</h2>
             <p>Entra al prototipo y elige la experiencia que quieres probar.</p>
           </div>
 
@@ -47,20 +47,20 @@ export function LoginPage() {
             />
 
             <Input
-              label="Contrasena"
+              label="Contraseña"
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Minimo 6 caracteres"
+              placeholder="Mínimo 6 caracteres"
               autoComplete="current-password"
             />
 
             <div className="login-actions">
-              <Link to="/seleccion-perfil">Olvide mi contrasena</Link>
+              <Link to="/seleccion-perfil">Olvidé mi contraseña</Link>
             </div>
 
             <Button type="submit" fullWidth>
-              Iniciar sesion
+              Iniciar sesión
             </Button>
           </form>
         </Card>

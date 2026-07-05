@@ -1,8 +1,9 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { AnalyzingPage } from './pages/AnalyzingPage';
 import { HomeProfessionalPage } from './pages/HomeProfessionalPage';
 import { HomeUserPage } from './pages/HomeUserPage';
+import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { NewConsultationPage } from './pages/NewConsultationPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -13,7 +14,7 @@ import { UserPlaceholderPage } from './pages/UserPlaceholderPage';
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/login" replace />,
+    element: <LandingPage />,
   },
   {
     path: '/login',
@@ -47,7 +48,7 @@ export const router = createBrowserRouter([
         element: (
           <UserPlaceholderPage
             title="Historial"
-            description="Aqui se mostraran las consultas realizadas por el usuario."
+            description="Aquí se mostrarán las consultas realizadas por el usuario."
           />
         ),
       },
@@ -56,7 +57,7 @@ export const router = createBrowserRouter([
         element: (
           <UserPlaceholderPage
             title="Materiales sugeridos"
-            description="Esta seccion se alimentara con los materiales generados al analizar una consulta."
+            description="Esta sección se alimentará con los materiales generados al analizar una consulta."
           />
         ),
       },
@@ -64,8 +65,8 @@ export const router = createBrowserRouter([
         path: '/usuario/ferreterias-cercanas',
         element: (
           <UserPlaceholderPage
-            title="Ferreterias cercanas"
-            description="Aqui se listaran comercios cercanos cuando se conecte la ubicacion."
+            title="Ferreterías cercanas"
+            description="Aquí se listarán comercios cercanos cuando se conecte la ubicación."
           />
         ),
       },

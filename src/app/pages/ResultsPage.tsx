@@ -15,92 +15,69 @@ import {
 } from '../../constants/mockResults';
 
 export function ResultsPage() {
-  // Try to load dynamic OpenAI or simulated result from localStorage
   const rawResult = localStorage.getItem('buildassist:last-result');
   let result = null;
 
   if (rawResult) {
     try {
       result = JSON.parse(rawResult);
-    } catch (e) {
-      console.error('Error parsing dynamic result', e);
+    } catch (error) {
+      console.error('Error parsing dynamic result', error);
     }
   }
 
-  // Determine which data to render
-  const diagnostico = result?.diagnostico || 'Se detecta una pared expuesta al sol durante gran parte del dia, lo que puede aumentar la temperatura del espacio.';
+  const diagnostico =
+    result?.diagnostico ||
+    'Se detecta una pared expuesta al sol durante gran parte del día, lo que puede aumentar la temperatura del espacio.';
   const materials = result?.materials || MOCK_MATERIALS;
   const steps = result?.steps || MOCK_STEPS;
   const videos = result?.videos || MOCK_VIDEOS;
   const hardwareStores = result?.hardwareStores || MOCK_HARDWARE_STORES;
 
-  // Try to load project details (containing the uploaded image and budget) from localStorage
   const rawProject = localStorage.getItem('buildassist:last-project');
   let project = null;
+
   if (rawProject) {
     try {
       project = JSON.parse(rawProject);
-    } catch (e) {
-      console.error('Error parsing project details', e);
+    } catch (error) {
+      console.error('Error parsing project details', error);
     }
   }
+
   const imagePreview = project?.imagePreview;
   const damageBudget = project?.damageBudget;
 
   return (
-    <div className="page-grid">
-      <PageTitle 
-        eyebrow="Resultados" 
-        title={result ? 'Recomendación Inteligente de IA' : 'Recomendacion preliminar'}
+    <div className="page-grid sv-page-panel">
+      <PageTitle
+        eyebrow="Resultados"
+        title={result ? 'Recomendación inteligente' : 'Recomendación preliminar'}
       >
         <p>
-          {result 
-            ? 'Análisis en tiempo real procesado por el Asistente de IA.' 
+          {result
+            ? 'Análisis generado con los datos capturados en la consulta.'
             : 'Contenido mock para validar el flujo antes de integrar IA, backend o APIs.'}
         </p>
       </PageTitle>
 
       <Card className="result-card">
-        <SectionTitle title="Diagnostico" />
-        <div style={{ display: 'flex', gap: 'var(--space-4)', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', marginTop: 'var(--space-2)' }}>
-          <div style={{ flex: '1', minWidth: '280px' }}>
-            {damageBudget && (
-              <div style={{ 
-                display: 'inline-block', 
-                background: 'rgba(16, 185, 129, 0.1)', 
-                color: '#10b981', 
-                padding: 'var(--space-1) var(--space-2)', 
-                borderRadius: 'var(--radius-sm)', 
-                fontSize: '0.85rem', 
-                fontWeight: 700, 
-                marginBottom: 'var(--space-2)',
-                border: '1px solid rgba(16, 185, 129, 0.2)'
-              }}>
-                💵 Presupuesto del Proyecto: ${damageBudget} USD
-              </div>
-            )}
-            <p style={{ lineHeight: '1.6', fontSize: '0.95rem', whiteSpace: 'pre-line', margin: 0 }}>{diagnostico}</p>
+        <SectionTitle title="Diagnóstico" />
+        <div className="result-summary">
+          <div className="result-summary-copy">
+            {damageBudget ? (
+              <span className="result-budget">
+                Presupuesto estimado: ${damageBudget} USD
+              </span>
+            ) : null}
+            <p>{diagnostico}</p>
           </div>
-          {imagePreview && (
-            <div style={{ 
-              width: '180px', 
-              height: '180px', 
-              borderRadius: 'var(--radius-md)', 
-              overflow: 'hidden', 
-              border: '1px solid var(--color-border)', 
-              background: 'var(--color-surface-hover)', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              flexShrink: 0
-            }}>
-              <img 
-                src={imagePreview} 
-                alt="Foto del daño analizado" 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-              />
+
+          {imagePreview ? (
+            <div className="result-image-preview">
+              <img src={imagePreview} alt="Foto del daño analizado" />
             </div>
-          )}
+          ) : null}
         </div>
       </Card>
 
@@ -109,10 +86,11 @@ export function ResultsPage() {
         <div className="material-grid">
           {materials.map((material: any, index: number) => {
             const matObj = typeof material === 'string' ? { name: material } : material;
+
             return (
-              <MaterialCard 
-                key={index} 
-                name={matObj.name} 
+              <MaterialCard
+                key={`${matObj.name}-${index}`}
+                name={matObj.name}
                 price={matObj.price}
                 store={matObj.store}
                 url={matObj.url}
@@ -141,7 +119,7 @@ export function ResultsPage() {
       </section>
 
       <section className="page-grid" id="ferreterias">
-        <SectionTitle title="Ferreterias cercanas" />
+        <SectionTitle title="Ferreterías cercanas" />
         <div className="hardware-grid">
           {hardwareStores.map((store: any) => (
             <HardwareStoreCard key={store.name} {...store} />
