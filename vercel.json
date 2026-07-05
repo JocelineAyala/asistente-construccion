@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!plano3d/.*|assets/.*|favicon.ico).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
