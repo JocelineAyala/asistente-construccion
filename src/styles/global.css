@@ -3985,6 +3985,11 @@ textarea:focus {
   box-shadow: var(--shadow-sm);
 }
 
+.chat-card .api-badge-simulated,
+.chat-card > .chat-info-banner {
+  display: none;
+}
+
 .chat-message-user .chat-message-content {
   background: var(--color-primary-soft);
   color: var(--color-primary-strong);
