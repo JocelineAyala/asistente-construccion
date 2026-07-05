@@ -1,0 +1,106 @@
+{
+  "name": "Preprocesado de Plano - fal.ai",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blueprint-upload",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*",
+          "binaryPropertyName": "data"
+        }
+      },
+      "id": "webhook-recibir",
+      "name": "Recibir Foto del Plano",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-40, 300],
+      "webhookId": "blueprint-upload"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "// Convierte la imagen binaria (campo 'data' del webhook) en un data-URI base64,\n// que es lo que fal.ai espera en 'image_url'.\nconst bin = $input.item.binary.data;\nif (!bin) throw new Error(\"No llegó imagen en el campo binario 'data'.\");\nconst dataUri = `data:${bin.mimeType};base64,${bin.data}`;\nreturn {\n  json: { image_url: dataUri },\n  binary: $input.item.binary,\n};"
+      },
+      "id": "code-preparar",
+      "name": "Preparar Imagen (data-URI)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fal.run/fal-ai/esrgan",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  image_url: $json.image_url,\n  scale: 2,\n  model: 'RealESRGAN_x4plus',\n  output_format: 'png'\n}) }}",
+        "options": {}
+      },
+      "id": "http-fal-upscale",
+      "name": "fal.ai Upscale (ESRGAN)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300],
+      "notes": "PENDIENTE: crea la credencial 'Header Auth' con Name=Authorization, Value=Key <TU_FAL_KEY> y selecciónala aquí. El resto ya está listo."
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.image.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data"
+            }
+          }
+        }
+      },
+      "id": "http-descargar",
+      "name": "Descargar Imagen Limpia",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "responseBinaryPropertyName": "data",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "image/png" },
+              { "name": "Access-Control-Allow-Origin", "value": "*" }
+            ]
+          }
+        }
+      },
+      "id": "respond",
+      "name": "Devolver Imagen a la App",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [920, 300]
+    }
+  ],
+  "connections": {
+    "Recibir Foto del Plano": {
+      "main": [[{ "node": "Preparar Imagen (data-URI)", "type": "main", "index": 0 }]]
+    },
+    "Preparar Imagen (data-URI)": {
+      "main": [[{ "node": "fal.ai Upscale (ESRGAN)", "type": "main", "index": 0 }]]
+    },
+    "fal.ai Upscale (ESRGAN)": {
+      "main": [[{ "node": "Descargar Imagen Limpia", "type": "main", "index": 0 }]]
+    },
+    "Descargar Imagen Limpia": {
+      "main": [[{ "node": "Devolver Imagen a la App", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

@@ -1,0 +1,21 @@
+{
+  "name": "plano3d-backend",
+  "version": "1.0.0",
+  "description": "Backend Express para analizar planos de construccion con fal.ai, Cloudinary, Roboflow y Cloudflare Workers AI.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cloudinary": "^2.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^2.0.2"
+  }
+}
