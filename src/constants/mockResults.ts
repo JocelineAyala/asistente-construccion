@@ -28,18 +28,3 @@ export const MOCK_VIDEOS = [
     imageLabel: 'Video 3',
   },
 ];
-
-export const MOCK_HARDWARE_STORES = [
-  {
-    name: 'Ferreteria El Constructor',
-    distance: '1.2 km',
-  },
-  {
-    name: 'Ferreteria La Esquina',
-    distance: '2.4 km',
-  },
-  {
-    name: 'Materiales San Jose',
-    distance: '3.1 km',
-  },
-];

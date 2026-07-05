@@ -12,7 +12,7 @@ export function UploadCard({ imagePreview, onImageChange }: UploadCardProps) {
     <Card className="upload-card">
       <div className="upload-preview">
         {imagePreview ? (
-          <img src={imagePreview} alt="Vista previa del espacio seleccionado" />
+          <img key={imagePreview} src={imagePreview} alt="Vista previa del espacio seleccionado" />
         ) : (
           <div className="upload-empty">
             <ImageUp size={32} />

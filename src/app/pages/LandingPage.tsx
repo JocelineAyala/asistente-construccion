@@ -22,7 +22,7 @@ import { APP_NAME } from '../../constants/app';
 const projectHighlights = [
   {
     icon: Camera,
-    title: 'Cambios pequeños del hogar',
+    title: 'Cambios pequeños en construcción',
     description:
       'Para reparar un hoyo, mejorar ventilación, bajar la temperatura o resolver necesidades puntuales con una guía clara.',
   },
@@ -42,7 +42,7 @@ const projectHighlights = [
     icon: MapPin,
     title: 'Contexto salvadoreño',
     description:
-      'La experiencia está pensada para hogares locales, con lenguaje cercano, apoyo visual y posibles ferreterías cercanas.',
+      'La experiencia está pensada para proyectos locales de construcción, con lenguaje cercano y apoyo visual paso a paso.',
   },
 ];
 
@@ -86,10 +86,10 @@ export function LandingPage() {
       <section className="landing-hero">
         <div className="landing-copy">
           <span className="eyebrow">Proyecto final</span>
-          <h1>Una guía visual para mejorar, medir y planificar espacios del hogar</h1>
+          <h1>Una guía visual para mejorar, medir y planificar espacios en construcción y edificación</h1>
           <p>
-            {APP_NAME} será una plataforma web para ayudar a personas a resolver mejoras del
-            hogar y crear planos sencillos, con acompañamiento paso a paso, lenguaje claro y una
+            {APP_NAME} será una plataforma web para ayudar a personas a resolver mejoras en
+            construcción y edificación y crear planos sencillos, con acompañamiento paso a paso, lenguaje claro y una
             experiencia visual inspirada en El Salvador.
           </p>
           <div className="landing-actions">
@@ -117,7 +117,7 @@ export function LandingPage() {
           <span className="eyebrow">De qué tratará</span>
           <h2 id="project-purpose">Dos caminos para el usuario normal</h2>
           <p>
-            El producto final permitirá elegir entre resolver cambios pequeños del hogar o crear
+            El producto final permitirá elegir entre resolver cambios pequeños en construcción o crear
             un plano básico. En ambos casos, la app irá guiando al usuario para capturar la
             información necesaria de forma sencilla.
           </p>

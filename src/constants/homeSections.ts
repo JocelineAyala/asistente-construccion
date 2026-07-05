@@ -2,7 +2,7 @@ export const USER_HOME_SECTIONS = [
   {
     path: '/usuario/nueva-consulta',
     title: 'Nueva consulta',
-    description: 'Espacio para iniciar una solicitud de ayuda doméstica.',
+    description: 'Espacio para iniciar una solicitud de ayuda en construcción.',
   },
   {
     path: '/usuario/historial',
@@ -13,11 +13,6 @@ export const USER_HOME_SECTIONS = [
     path: '/usuario/materiales-sugeridos',
     title: 'Materiales sugeridos',
     description: 'Aparecerán después de analizar una consulta.',
-  },
-  {
-    path: '/usuario/ferreterias-cercanas',
-    title: 'Ferreterías cercanas',
-    description: 'Placeholder para comercios disponibles cerca del usuario.',
   },
 ];
 
