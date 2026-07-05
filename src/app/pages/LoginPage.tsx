@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Chrome, HardHat } from 'lucide-react';
+import { Chrome } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { MobileShell } from '../../components/layout/MobileShell';
 import { Button } from '../../components/ui/Button';
@@ -8,6 +8,7 @@ import { Card } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { isFirebaseConfigured } from '../../lib/firebase';
 import { APP_NAME } from '../../constants/app';
+import logo from '../../assets/logo.svg';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ export function LoginPage() {
       <section className="login-panel" aria-labelledby="login-title">
         <div className="login-brand">
           <span className="login-mark" aria-hidden="true">
-            <HardHat size={34} />
+            <img src={logo} alt="" />
           </span>
           <div>
             <span className="eyebrow">Bienvenido</span>

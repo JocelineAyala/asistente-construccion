@@ -12,7 +12,7 @@ export function HomeUserPage() {
   return (
     <div className="page-grid sv-page-panel sv-home-page">
       <section className="sv-hero">
-        <PageTitle eyebrow="Inicio" title="Asistente de construcción y edificación">
+        <PageTitle eyebrow="Inicio" title="Kroma">
           <span className="sv-title-accent" aria-hidden="true" />
           <p>
             Tu asesor arquitectónico está listo para orientarte. Cuéntale qué necesitas o

@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { Clock3, Home, Plus, UsersRound } from 'lucide-react';
 import mayanPattern from '../../assets/sidebar/mayan-pattern.svg';
 import sidebarBottom from '../../assets/sidebar/sidebar-bottom.svg';
+import logo from '../../assets/logo.svg';
 import { APP_NAME } from '../../constants/app';
 
 const sidebarItems = [
@@ -23,7 +24,7 @@ export function Sidebar({ isOpen = true }: SidebarProps) {
       <img className="sv-sidebar-pattern" src={mayanPattern} alt="" aria-hidden="true" />
 
       <div className="sv-sidebar-brand">
-        <img src="/src/assets/logo.svg" alt="" className="sv-sidebar-logo" />
+        <img src={logo} alt="" className="sv-sidebar-logo" />
         <span>{APP_NAME}</span>
       </div>
 

@@ -1,4 +1,5 @@
-import { HardHat, UserRound } from 'lucide-react';
+import { UserRound } from 'lucide-react';
+import logo from '../../assets/logo.svg';
 import { APP_NAME } from '../../constants/app';
 
 export function AppHeader() {
@@ -6,7 +7,7 @@ export function AppHeader() {
     <header className="app-header">
       <div className="app-header-brand">
         <span className="app-icon" aria-hidden="true">
-          <HardHat size={20} />
+          <img src={logo} alt="" />
         </span>
         <span>{APP_NAME}</span>
       </div>

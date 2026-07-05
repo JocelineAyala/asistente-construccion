@@ -2,7 +2,6 @@ import {
   ArrowRight,
   Camera,
   ClipboardList,
-  Home,
   MapPin,
   PencilRuler,
   PackageCheck,
@@ -17,6 +16,7 @@ import leaves from '../../assets/decorations/leaves.svg';
 import sun from '../../assets/decorations/sun.svg';
 import waves from '../../assets/decorations/waves.svg';
 import houseIllustration from '../../assets/illustrations/house.svg';
+import logo from '../../assets/logo.svg';
 import { APP_NAME } from '../../constants/app';
 
 const projectHighlights = [
@@ -74,7 +74,7 @@ export function LandingPage() {
       <header className="landing-nav">
         <Link to="/" className="landing-brand" aria-label={APP_NAME}>
           <span className="landing-brand-mark">
-            <Home size={24} />
+            <img src={logo} alt="" />
           </span>
           <span>{APP_NAME}</span>
         </Link>
