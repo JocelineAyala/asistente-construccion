@@ -1,11 +1,6 @@
-import { AirVent, ArrowRight, AudioWaveform, Box, Lightbulb, Ruler } from 'lucide-react';
-import { FeatureCard } from '../../components/common/FeatureCard';
+import { ArrowRight, Box } from 'lucide-react';
 import { PageTitle } from '../../components/common/PageTitle';
 import { Button } from '../../components/ui/Button';
-import { PROFESSIONAL_HOME_SECTIONS } from '../../constants/homeSections';
-
-const PROFESSIONAL_SECTION_ICONS = [AudioWaveform, Lightbulb, AirVent, Ruler];
-const PROFESSIONAL_SECTION_TONES = ['blue', 'yellow', 'green', 'red'] as const;
 
 export function HomeProfessionalPage() {
   return (
@@ -38,17 +33,6 @@ export function HomeProfessionalPage() {
         </Button>
       </section>
 
-      <section className="feature-grid" aria-label="Secciones futuras para usuario profesional">
-        {PROFESSIONAL_HOME_SECTIONS.map((section, index) => (
-          <FeatureCard
-            key={section.title}
-            title={section.title}
-            description={section.description}
-            icon={PROFESSIONAL_SECTION_ICONS[index]}
-            tone={PROFESSIONAL_SECTION_TONES[index]}
-          />
-        ))}
-      </section>
     </div>
   );
 }
